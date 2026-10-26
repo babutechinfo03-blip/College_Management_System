@@ -42,6 +42,20 @@ public class PrincipalController {
         return ResponseEntity.ok().build();
     }
 
+    // Global User Oversight
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getUserOversight(@RequestParam(required = false) String role) {
+        com.college.erp.entity.Role queryRole = role != null ? com.college.erp.entity.Role.valueOf(role.toUpperCase())
+                : null;
+        return ResponseEntity.ok(principalService.getUserOversight(queryRole));
+    }
+
+    @PostMapping("/users/{userId}/reset-password")
+    public ResponseEntity<Map<String, String>> forcePasswordReset(@PathVariable Long userId) {
+        principalService.forcePasswordReset(userId);
+        return ResponseEntity.ok(Map.of("message", "Password reset successfully to default logic."));
+    }
+
     // Academic Control (Freeze Logic)
     @GetMapping("/academic-control")
     public ResponseEntity<AcademicControl> getAcademicControl(

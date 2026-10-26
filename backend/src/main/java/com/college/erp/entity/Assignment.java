@@ -33,6 +33,8 @@ public class Assignment {
 
     private LocalDateTime deadline;
 
+    private String attachmentPath;
+
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 }

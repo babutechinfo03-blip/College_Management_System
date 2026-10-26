@@ -1,0 +1,15 @@
+﻿Field	Type	Null	Key	Default	Extra
+is_active	bit(1)	NO		NULL	
+department_id	bigint	YES	MUL	NULL	
+id	bigint	NO	PRI	NULL	auto_increment
+user_id	bigint	YES	UNI	NULL	
+address	varchar(255)	YES		NULL	
+assistant_id	varchar(255)	NO	UNI	NULL	
+blood_group	varchar(255)	YES		NULL	
+designation	varchar(255)	YES		NULL	
+dob	varchar(255)	YES		NULL	
+first_name	varchar(255)	NO		NULL	
+last_name	varchar(255)	YES		NULL	
+phone	varchar(255)	YES		NULL	
+photo_path	varchar(255)	YES		NULL	
+whatsapp_number	varchar(255)	YES		NULL	

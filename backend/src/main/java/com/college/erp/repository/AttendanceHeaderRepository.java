@@ -12,9 +12,9 @@ public interface AttendanceHeaderRepository extends JpaRepository<AttendanceHead
             CourseType programType, Long degreeId, Long specializationId, LocalDate date, int hour, int year,
             int semester);
 
-    List<AttendanceHeader> findByAssistantStaffIdOrderByDateDescHourDesc(Long assistantId);
+    List<AttendanceHeader> findByFacultyIdOrderByDateDescHourDesc(Long facultyId);
 
-    List<AttendanceHeader> findTop5ByAssistantStaffIdOrderByDateDescHourDesc(Long assistantId);
+    List<AttendanceHeader> findTop5ByFacultyIdOrderByDateDescHourDesc(Long facultyId);
 
     List<AttendanceHeader> findByDate(LocalDate date);
 }

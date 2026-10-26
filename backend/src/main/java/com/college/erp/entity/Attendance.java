@@ -20,8 +20,8 @@ public class Attendance {
     private Student student;
 
     @ManyToOne
-    @JoinColumn(name = "staff_id")
-    private AssistantStaff assistantStaff;
+    @JoinColumn(name = "faculty_id")
+    private Faculty faculty;
 
     private LocalDate date;
 

@@ -1,7 +1,7 @@
 SELECT 'Starting Import...' as DebugMessage;
 -- DUMMY DATA INSERTS
--- Encoded Password: 'password'
-SET @default_pass = '$2a$10$eAccYoNOHEqXve8aIWT8Nu3.hD.S.yveD..p/';
+-- Encoded Password: 'Demo@1234'
+SET @default_pass = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
 INSERT INTO users (username, password, email, role, is_active, created_at) VALUES ('2025CSE001', @default_pass, '2025cse001@college.edu', 'STUDENT', 1, NOW()) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id);
 SET @uid = LAST_INSERT_ID();
 INSERT IGNORE INTO students (user_id, student_id, first_name, last_name, degree_id, specialization_id, current_year, current_semester, batch, address, phone, whatsapp_number, is_active)

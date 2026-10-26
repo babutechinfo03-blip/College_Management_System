@@ -25,6 +25,12 @@ public class StudentController {
     @Autowired
     private InternalMarkRepository internalMarkRepository;
 
+    @Autowired
+    private com.college.erp.repository.AssignmentRepository assignmentRepository;
+
+    @Autowired
+    private com.college.erp.repository.AssignmentSubmissionRepository assignmentSubmissionRepository;
+
     @GetMapping
     @PreAuthorize("hasRole('PRINCIPAL') or hasRole('STAFF')")
     public ResponseEntity<List<Student>> getAllStudents() {
@@ -58,7 +64,21 @@ public class StudentController {
         // Calculate Average Marks
         List<InternalMark> marks = internalMarkRepository.findByStudentId(id);
         double avgMark = marks.stream().mapToInt(InternalMark::getMarks).average().orElse(0.0);
-        int pendingTasks = 0; // Placeholder for assignments logic if needed
+
+        // Calculate Pending Tasks
+        Long sectionId = student.getSection() != null ? student.getSection().getId() : null;
+        int pendingTasks = 0;
+        if (sectionId != null) {
+            List<Assignment> totalAssignments = assignmentRepository.findBySectionId(sectionId);
+            List<AssignmentSubmission> mySubmissions = assignmentSubmissionRepository.findByStudentId(id);
+            java.util.Set<Long> submittedIds = mySubmissions.stream()
+                    .map(s -> s.getAssignment().getId())
+                    .collect(java.util.stream.Collectors.toSet());
+
+            pendingTasks = (int) totalAssignments.stream()
+                    .filter(a -> !submittedIds.contains(a.getId()))
+                    .count();
+        }
 
         Map<String, Object> profile = new HashMap<>();
         profile.put("studentId", student.getStudentId());

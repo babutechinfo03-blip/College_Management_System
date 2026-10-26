@@ -44,8 +44,8 @@ public class AttendanceHeader {
     private int hour; // 1-8
 
     @ManyToOne
-    @JoinColumn(name = "assistant_id", nullable = false)
-    private AssistantStaff assistantStaff;
+    @JoinColumn(name = "faculty_id", nullable = false)
+    private Faculty faculty;
 
     @Column(name = "submitted_at")
     @Builder.Default

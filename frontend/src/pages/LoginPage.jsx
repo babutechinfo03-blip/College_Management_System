@@ -61,7 +61,14 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const config = roleConfig[role] || { title: 'Secure Login', subtitle: 'Access your portal', hint: 'User ID', back: '/', endpoint: '/auth/login', color: 'var(--primary)' };
+  const config = roleConfig[role] || {
+    title: 'Identity Portal',
+    subtitle: 'Secure Unified Gateway',
+    hint: 'Enter identification ID',
+    back: '/',
+    endpoint: '/auth/login',
+    color: 'var(--primary)'
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,9 +81,10 @@ const LoginPage = () => {
         'OFFICE': '/office',
         'HOD': '/staff',
         'FACULTY': '/staff',
+        'ADVISOR': '/staff',
+        'ASSISTANT_STAFF': '/assistant',
         'STUDENT': '/student',
         'PARENT': '/parent',
-        'ASSISTANT_STAFF': '/assistant'
       };
       window.location.href = rolePathMap[user.role] || '/';
     } catch (err) {

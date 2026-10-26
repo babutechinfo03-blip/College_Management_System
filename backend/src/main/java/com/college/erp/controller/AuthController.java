@@ -62,6 +62,62 @@ public class AuthController {
         return authenticateWithRole(loginRequest, "PARENT");
     }
 
+    // Unified login endpoint to handle any valid user
+    @PostMapping("/login")
+    public ResponseEntity<?> unifiedLogin(@RequestBody LoginRequest loginRequest) {
+        logger.info("=== Unified Login Attempt ===");
+        logger.info("Username: {}", loginRequest.username());
+
+        try {
+            // Step 1: Authenticate credentials
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            org.springframework.security.core.userdetails.User userDetails = (org.springframework.security.core.userdetails.User) authentication
+                    .getPrincipal();
+
+            // Step 2: Fetch user to identify role
+            User user = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            String userRole = user.getRole().name();
+            logger.info("✓ Login Success. Role: {}", userRole);
+
+            // Step 4: Proceed with normal authentication completion
+            // We can reuse a common private method for the last bits of response generation
+            return completeAuthentication(user, userDetails);
+
+        } catch (org.springframework.security.authentication.BadCredentialsException e) {
+            return ResponseEntity.status(401).body(java.util.Map.of("message", "Invalid username or password"));
+        } catch (Exception e) {
+            logger.error("Error in unified login: {}", e.getMessage());
+            return ResponseEntity.status(500).body(java.util.Map.of("message", "Authentication failed"));
+        }
+    }
+
+    // Helper to complete authentication and generate response
+    private ResponseEntity<?> completeAuthentication(User user,
+            org.springframework.security.core.userdetails.User userDetails) {
+        if (!user.isActive()) {
+            return ResponseEntity.status(403).body(java.util.Map.of("message", "Account is disabled"));
+        }
+
+        String jwt = jwtUtils.generateToken(user.getUsername());
+
+        java.util.List<String> staffRoles = new java.util.ArrayList<>();
+        if (java.util.List.of("FACULTY", "HOD", "ADVISOR").contains(user.getRole().name())) {
+            facultyRepository.findByUser(user).ifPresent(faculty -> {
+                if (faculty.getRoles() != null) {
+                    faculty.getRoles().forEach(sr -> staffRoles.add(sr.getRole().name()));
+                }
+            });
+        }
+
+        return ResponseEntity
+                .ok(new JwtResponse(jwt, user.getUsername(), user.getRole().name(), user.getEmail(), staffRoles));
+    }
+
     // Helper method for single role validation
     private ResponseEntity<?> authenticateWithRole(LoginRequest loginRequest, String expectedRole) {
         return authenticateWithRoles(loginRequest, java.util.List.of(expectedRole));
@@ -116,24 +172,8 @@ public class AuthController {
 
             logger.info("✓ Role validation passed");
 
-            // Step 4: Generate JWT only after role validation passes
-            logger.debug("Step 4: Generating JWT token...");
-            String jwt = jwtUtils.generateToken(loginRequest.username());
-            logger.info("✓ JWT token generated successfully");
-
-            // Case-specific: Fetch staff roles if staff login
-            java.util.List<String> staffRoles = new java.util.ArrayList<>();
-            if (allowedRoles.contains("FACULTY") || allowedRoles.contains("HOD") || allowedRoles.contains("ADVISOR")) {
-                facultyRepository.findByUser(user).ifPresent(faculty -> {
-                    if (faculty.getRoles() != null) {
-                        faculty.getRoles().forEach(sr -> staffRoles.add(sr.getRole().name()));
-                    }
-                });
-            }
-
-            logger.info("=== Authentication Complete ===");
-            return ResponseEntity
-                    .ok(new JwtResponse(jwt, userDetails.getUsername(), userRole, user.getEmail(), staffRoles));
+            // Proceed with normal authentication completion
+            return completeAuthentication(user, userDetails);
 
         } catch (org.springframework.security.authentication.BadCredentialsException e) {
             logger.error("✗ Authentication failed: Bad credentials for user '{}'", loginRequest.username());

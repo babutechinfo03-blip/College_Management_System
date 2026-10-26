@@ -6,6 +6,10 @@ import PrincipalOverview from './principal/PrincipalOverview.jsx';
 import OfficeManagement from './principal/OfficeManagement.jsx';
 import AcademicMonitoring from './principal/AcademicMonitoring.jsx';
 import DepartmentView from './principal/DepartmentView.jsx';
+import DepartmentDetails from './principal/DepartmentDetails.jsx';
+import ApprovalCenter from './principal/ApprovalCenter.jsx';
+import UserOversight from './principal/UserOversight.jsx';
+import Reports from './principal/Reports.jsx';
 
 const PrincipalDashboard = () => {
   const { user, logout } = useAuth();
@@ -38,6 +42,15 @@ const PrincipalDashboard = () => {
           <Link to="/principal/departments" className={`sidebar-item ${isActive('/principal/departments')}`}>
             <span style={{ fontSize: '1.25rem' }}>🏛️</span> Departments
           </Link>
+          <Link to="/principal/approvals" className={`sidebar-item ${isActive('/principal/approvals')}`}>
+            <span style={{ fontSize: '1.25rem' }}>✅</span> Approval Center
+          </Link>
+          <Link to="/principal/users" className={`sidebar-item ${isActive('/principal/users')}`}>
+            <span style={{ fontSize: '1.25rem' }}>👥</span> User Oversight
+          </Link>
+          <Link to="/principal/reports" className={`sidebar-item ${isActive('/principal/reports')}`}>
+            <span style={{ fontSize: '1.25rem' }}>📈</span> Reports
+          </Link>
         </nav>
 
         <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem' }}>
@@ -64,6 +77,9 @@ const PrincipalDashboard = () => {
               {location.pathname === '/principal/office' && 'Manage office staff access and operations.'}
               {location.pathname === '/principal/academics' && 'Monitor academic progress and freeze controls.'}
               {location.pathname === '/principal/departments' && 'Oversee departments and assign HODs.'}
+              {location.pathname === '/principal/approvals' && 'Central inbox for cross-college approvals.'}
+              {location.pathname === '/principal/users' && 'Global user directory and credential overrides.'}
+              {location.pathname === '/principal/reports' && 'Exportable insights and analytics.'}
             </p>
           </div>
           <ThemeToggle />
@@ -75,6 +91,10 @@ const PrincipalDashboard = () => {
             <Route path="office" element={<OfficeManagement />} />
             <Route path="academics" element={<AcademicMonitoring />} />
             <Route path="departments" element={<DepartmentView />} />
+            <Route path="departments/:departmentId" element={<DepartmentDetails />} />
+            <Route path="approvals" element={<ApprovalCenter />} />
+            <Route path="users" element={<UserOversight />} />
+            <Route path="reports" element={<Reports />} />
             <Route path="*" element={<PrincipalOverview />} />
           </Routes>
         </div>

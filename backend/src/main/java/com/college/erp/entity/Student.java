@@ -34,6 +34,10 @@ public class Student {
     @JoinColumn(name = "specialization_id")
     private Specialization specialization;
 
+    @ManyToOne
+    @JoinColumn(name = "section_id")
+    private Section section;
+
     private int currentYear;
 
     @Column(nullable = false)

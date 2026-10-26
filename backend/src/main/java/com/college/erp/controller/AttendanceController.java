@@ -53,9 +53,9 @@ public class AttendanceController {
         try {
             String username = org.springframework.security.core.context.SecurityContextHolder.getContext()
                     .getAuthentication().getName();
-            AssistantStaff assistant = assistantStaffRepository
+            Faculty faculty = facultyRepository
                     .findByUser(userRepository.findByUsername(username).orElseThrow())
-                    .orElseThrow(() -> new RuntimeException("Assistant Staff not found"));
+                    .orElseThrow(() -> new RuntimeException("Faculty not found"));
 
             CourseType programType = CourseType.valueOf(data.get("programType").toString());
             Long degreeId = Long.valueOf(data.get("degreeId").toString());
@@ -88,7 +88,7 @@ public class AttendanceController {
                     .semester(semester)
                     .date(date)
                     .hour(hour)
-                    .assistantStaff(assistant)
+                    .faculty(faculty)
                     .submittedAt(java.time.LocalDateTime.now())
                     .build();
 
@@ -108,7 +108,7 @@ public class AttendanceController {
                 // For backward compatibility / existing views
                 Attendance legacy = Attendance.builder()
                         .student(student)
-                        .assistantStaff(assistant)
+                        .faculty(faculty)
                         .date(date)
                         .status(com.college.erp.entity.AttendanceStatus.valueOf(entry.get("status").toString()))
                         .subjectCode("HOUR_" + hour)
@@ -146,12 +146,12 @@ public class AttendanceController {
 
         String username = org.springframework.security.core.context.SecurityContextHolder.getContext()
                 .getAuthentication().getName();
-        AssistantStaff assistant = assistantStaffRepository
+        Faculty faculty = facultyRepository
                 .findByUser(userRepository.findByUsername(username).orElseThrow())
-                .orElseThrow(() -> new RuntimeException("Assistant Staff not found"));
+                .orElseThrow(() -> new RuntimeException("Faculty not found"));
 
         List<AttendanceHeader> history = attendanceHeaderRepository
-                .findByAssistantStaffIdOrderByDateDescHourDesc(assistant.getId());
+                .findByFacultyIdOrderByDateDescHourDesc(faculty.getId());
 
         // Dynamic Filtering
         java.util.stream.Stream<AttendanceHeader> stream = history.stream();
@@ -195,7 +195,7 @@ public class AttendanceController {
             m.put("year", h.getYear());
             m.put("semester", h.getSemester());
             m.put("hour", h.getHour());
-            m.put("markedBy", assistant.getAssistantId()); // Added for Smart History requirement
+            m.put("markedBy", faculty.getStaffId()); // Updated for Faculty
             m.put("submittedAt", h.getSubmittedAt());
             m.put("totalStudents", total);
             m.put("presentCount", present);
@@ -211,13 +211,13 @@ public class AttendanceController {
     public ResponseEntity<?> getStats() {
         String username = org.springframework.security.core.context.SecurityContextHolder.getContext()
                 .getAuthentication().getName();
-        AssistantStaff assistant = assistantStaffRepository
+        Faculty faculty = facultyRepository
                 .findByUser(userRepository.findByUsername(username).orElseThrow())
-                .orElseThrow(() -> new RuntimeException("Assistant Staff not found"));
+                .orElseThrow(() -> new RuntimeException("Faculty not found"));
 
         LocalDate today = LocalDate.now();
         List<AttendanceHeader> headers = attendanceHeaderRepository
-                .findByAssistantStaffIdOrderByDateDescHourDesc(assistant.getId());
+                .findByFacultyIdOrderByDateDescHourDesc(faculty.getId());
 
         long submittedToday = headers.stream().filter(h -> h.getDate().equals(today)).count();
 

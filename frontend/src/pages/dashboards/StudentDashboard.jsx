@@ -6,6 +6,10 @@ import StudentOverview from './student/StudentOverview.jsx';
 import StudentAttendance from './student/StudentAttendance.jsx';
 import StudentAssignments from './student/StudentAssignments.jsx';
 import StudentResults from './student/StudentResults.jsx';
+import StudentTimetable from './student/StudentTimetable.jsx';
+import StudentCourses from './student/StudentCourses.jsx';
+import StudentMarks from './student/StudentMarks.jsx';
+import StudentCirculars from './student/StudentCirculars.jsx';
 
 const StudentDashboard = () => {
     const { user, logout } = useAuth();
@@ -15,7 +19,7 @@ const StudentDashboard = () => {
 
     return (
         <div className="dashboard-layout">
-            <aside className="sidebar" style={{ background: '#1e3a8a' }}>
+            <aside className="sidebar">
                 <div style={{ marginBottom: '3rem' }}>
                     <h1 className="logo" style={{ color: 'white', fontSize: '1.75rem', fontWeight: '800' }}>
                         Student<span style={{ color: '#93c5fd' }}>Portal</span>
@@ -26,17 +30,29 @@ const StudentDashboard = () => {
                 </div>
 
                 <nav style={{ flex: 1 }}>
-                    <Link to="/student" className={`sidebar-item ${isActive('/student')}`}>
+                    <Link to="/student/overview" className={`sidebar-item ${isActive('/student/overview')}`}>
                         <span style={{ fontSize: '1.25rem' }}>🏠</span> Overview
+                    </Link>
+                    <Link to="/student/timetable" className={`sidebar-item ${isActive('/student/timetable')}`}>
+                        <span style={{ fontSize: '1.25rem' }}>📅</span> Time Table
                     </Link>
                     <Link to="/student/attendance" className={`sidebar-item ${isActive('/student/attendance')}`}>
                         <span style={{ fontSize: '1.25rem' }}>📊</span> Attendance
+                    </Link>
+                    <Link to="/student/courses" className={`sidebar-item ${isActive('/student/courses')}`}>
+                        <span style={{ fontSize: '1.25rem' }}>📚</span> Courses
                     </Link>
                     <Link to="/student/assignments" className={`sidebar-item ${isActive('/student/assignments')}`}>
                         <span style={{ fontSize: '1.25rem' }}>📄</span> Assignments
                     </Link>
                     <Link to="/student/results" className={`sidebar-item ${isActive('/student/results')}`}>
                         <span style={{ fontSize: '1.25rem' }}>🎓</span> Results
+                    </Link>
+                    <Link to="/student/marks" className={`sidebar-item ${isActive('/student/marks')}`}>
+                        <span style={{ fontSize: '1.25rem' }}>🎯</span> Marks
+                    </Link>
+                    <Link to="/student/circulars" className={`sidebar-item ${isActive('/student/circulars')}`}>
+                        <span style={{ fontSize: '1.25rem' }}>📢</span> Circulars
                     </Link>
                 </nav>
 
@@ -63,9 +79,13 @@ const StudentDashboard = () => {
                 <div className="dashboard-main animate-fade-in">
                     <Routes>
                         <Route index element={<StudentOverview />} />
+                        <Route path="timetable" element={<StudentTimetable />} />
                         <Route path="attendance" element={<StudentAttendance />} />
                         <Route path="assignments" element={<StudentAssignments />} />
                         <Route path="results" element={<StudentResults />} />
+                        <Route path="courses" element={<StudentCourses />} />
+                        <Route path="marks" element={<StudentMarks />} />
+                        <Route path="circulars" element={<StudentCirculars />} />
                         <Route path="*" element={<StudentOverview />} />
                     </Routes>
                 </div>

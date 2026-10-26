@@ -8,15 +8,28 @@ import HodDashboard from './HodDashboard';
 const StaffOverview = () => {
     const { user } = useAuth();
     const [dashboardData, setDashboardData] = useState(null);
+    const [circulars, setCirculars] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchDashboard = async () => {
             setLoading(true); // Ensure loading state is set on role change
             try {
+                // Determine highest role for dashboard data context
+                const highestRole = user?.staffRoles?.includes('HOD') ? 'HOD' :
+                    user?.staffRoles?.includes('CLASS_ADVISOR') ? 'CLASS_ADVISOR' :
+                        'FACULTY';
                 // Pass activeRole to the backend to get specific data
-                const response = await api.get(`/staff/dashboard?activeRole=${user.activeRole}`);
+                const response = await api.get(`/staff/dashboard?activeRole=${highestRole}`);
                 setDashboardData(response.data);
+
+                // Fetch Recent Circulars
+                try {
+                    const circRes = await api.get('/circulars/feed');
+                    setCirculars(circRes.data || []);
+                } catch (e) {
+                    console.error("Failed to load circulars", e);
+                }
             } catch (error) {
                 console.error('Failed to fetch dashboard data:', error);
             } finally {
@@ -24,17 +37,18 @@ const StaffOverview = () => {
             }
         };
         fetchDashboard();
-    }, [user.activeRole]); // Re-fetch when role switches
+    }, [user?.staffRoles]); // Re-fetch when role switches
 
     if (loading) return <div>Synchronizing Dashboard...</div>;
 
     const renderSecondaryDashboard = () => {
-        switch (user.activeRole) {
-            case 'FACULTY': return <FacultyDashboard data={dashboardData} />;
-            case 'CLASS_ADVISOR': return <AdvisorDashboard data={dashboardData} />;
-            case 'HOD': return <HodDashboard data={dashboardData} />;
-            default: return <FacultyDashboard data={dashboardData} />;
+        if (user?.staffRoles?.includes('HOD')) {
+            return <HodDashboard data={dashboardData} />;
         }
+        if (user?.staffRoles?.includes('CLASS_ADVISOR')) {
+            return <AdvisorDashboard data={dashboardData} />;
+        }
+        return <FacultyDashboard data={dashboardData} />;
     };
 
     return (
@@ -88,6 +102,33 @@ const StaffOverview = () => {
                             </div>
                         )}
                     </div>
+                </div>
+            </div>
+
+            {/* 3. Recent Circulars Widget */}
+            <div className="glass-card" style={{ padding: '2rem', marginTop: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h3 style={{ fontSize: '1.25rem' }}>Recent Circulars</h3>
+                    {circulars.length > 0 && <span className="badge badge-danger">{circulars.filter(c => !c.read).length || 0} Unread</span>}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {circulars.length > 0 ? (
+                        circulars.slice(0, 4).map(circular => (
+                            <div key={circular.id} style={{ padding: '1.25rem', background: '#f8fafc', borderRadius: '0.75rem', borderLeft: `4px solid ${circular.priority === 'URGENT' || circular.priority === 'HIGH' ? '#ef4444' : 'var(--primary)'}` }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                    <h4 style={{ fontWeight: '700', color: 'var(--slate-900)', fontSize: '0.95rem' }}>{circular.title}</h4>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(circular.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {circular.content}
+                                </p>
+                            </div>
+                        ))
+                    ) : (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+                            <p>No new circulars at this time.</p>
+                        </div>
+                    )}
                 </div>
             </div>
 

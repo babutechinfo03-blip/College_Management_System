@@ -35,7 +35,7 @@ const InstitutionSelection = () => {
                             <div style={{ fontSize: '3rem', marginBottom: '1.5rem', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.1))' }}>{role.icon}</div>
                             <h3 style={{ fontSize: '1.5rem', marginBottom: '0.75rem', color: 'var(--text-main)' }}>{role.title}</h3>
                             <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '2.5rem', flex: 1, lineHeight: '1.7' }}>{role.desc}</p>
-                            <button className="btn btn-primary btn-block" style={{ background: role.color, border: 'none', padding: '1rem' }} onClick={() => navigate(`/institution/${role.id}`)}>
+                            <button className="btn btn-primary btn-block" style={{ background: role.color, border: 'none', padding: '1rem' }} onClick={() => navigate(`/auth-flow/institution/${role.id}`)}>
                                 Enter Workspace
                             </button>
                         </div>

@@ -15,7 +15,27 @@ const OfficeManagement = () => {
     const fetchUsers = async () => {
         try {
             const response = await axios.get('/api/principal/office-users');
-            setUsers(response.data);
+
+            // Auto-create hook if no office accounts exist
+            if (response.data && response.data.length === 0) {
+                try {
+                    await axios.post('/api/principal/office-users', {
+                        username: 'office_admin',
+                        email: 'office@college.edu',
+                        password: 'password'
+                    });
+                    // Re-fetch after auto-creation
+                    const refresh = await axios.get('/api/principal/office-users');
+                    setUsers(refresh.data);
+                    setSuccess('Default office_admin account auto-created.');
+                    setTimeout(() => setSuccess(''), 4000);
+                } catch (createErr) {
+                    console.error('Failed to auto-create default office admin:', createErr);
+                }
+            } else {
+                setUsers(response.data);
+            }
+
             setLoading(false);
         } catch (err) {
             console.error('Error fetching office users:', err);
@@ -24,11 +44,29 @@ const OfficeManagement = () => {
     };
 
     const handleToggleStatus = async (userId) => {
+        if (!window.confirm(`Are you sure you want to toggle this user's status?`)) return;
         try {
             await axios.patch(`/api/principal/users/${userId}/toggle-status`);
             fetchUsers(); // Refresh list
+            setSuccess('User status updated.');
+            setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
             console.error('Error toggling status:', err);
+            setError('Failed to toggle status.');
+            setTimeout(() => setError(''), 3000);
+        }
+    };
+
+    const handleResetPassword = async (userId, username) => {
+        if (!window.confirm(`Are you sure you want to FORCE reset the password for ${username}? (It will reset to username@123)`)) return;
+
+        try {
+            await axios.post(`/api/principal/users/${userId}/reset-password`);
+            setSuccess(`Password for ${username} reset successfully.`);
+            setTimeout(() => setSuccess(''), 3000);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Password reset failed');
+            setTimeout(() => setError(''), 3000);
         }
     };
 
@@ -127,15 +165,26 @@ const OfficeManagement = () => {
                                                     {user.active ? 'Active' : 'Inactive'}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '0.75rem' }}>
+                                            <td style={{ padding: '0.75rem', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                <button
+                                                    onClick={() => handleResetPassword(user.id, user.username)}
+                                                    className="btn btn-sm hover-lift"
+                                                    style={{ border: 'none', background: '#3b82f6', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                                                >
+                                                    Reset PW
+                                                </button>
                                                 <button
                                                     onClick={() => handleToggleStatus(user.id)}
+                                                    className="btn btn-sm hover-lift"
                                                     style={{
                                                         border: 'none',
-                                                        background: 'transparent',
-                                                        color: user.active ? 'var(--error)' : 'var(--success)',
+                                                        background: user.active ? '#ef4444' : '#10b981',
+                                                        color: 'white',
+                                                        padding: '0.4rem 0.8rem',
+                                                        borderRadius: '4px',
                                                         cursor: 'pointer',
-                                                        fontWeight: '600'
+                                                        fontWeight: '600',
+                                                        fontSize: '0.75rem'
                                                     }}
                                                 >
                                                     {user.active ? 'Deactivate' : 'Activate'}

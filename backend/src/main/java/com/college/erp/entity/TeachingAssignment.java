@@ -38,4 +38,23 @@ public class TeachingAssignment {
     @ManyToOne
     @JoinColumn(name = "section_id")
     private Section section;
+
+    @Column(name = "assigned_by_hod_id")
+    private Long assignedByHodId;
+
+    @Column(name = "faculty_department_id")
+    private Long facultyDepartmentId;
+
+    @Column(name = "requesting_department_id")
+    private Long requestingDepartmentId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "approval_status")
+    private ApprovalStatus approvalStatus = ApprovalStatus.APPROVED;
+
+    @Column(name = "approved_by_hod_id")
+    private Long approvedByHodId;
+
+    @Column(name = "approved_at")
+    private java.time.LocalDateTime approvedAt;
 }

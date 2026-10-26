@@ -1,0 +1,19 @@
+﻿Field	Type	Null	Key	Default	Extra
+date	date	YES		NULL	
+id	bigint	NO	PRI	NULL	auto_increment
+semester_id	bigint	YES	MUL	NULL	
+staff_id	bigint	YES	MUL	NULL	
+student_id	bigint	YES	MUL	NULL	
+subject_code	varchar(255)	YES		NULL	
+status	enum('PRESENT','ABSENT','LATE')	YES		NULL	
+Field	Type	Null	Key	Default	Extra
+date	date	NO		NULL	
+hour	int	NO		NULL	
+semester	int	NO		NULL	
+year	int	NO		NULL	
+assistant_id	bigint	NO	MUL	NULL	
+degree_id	bigint	NO	MUL	NULL	
+id	bigint	NO	PRI	NULL	auto_increment
+specialization_id	bigint	NO	MUL	NULL	
+submitted_at	datetime(6)	YES		NULL	
+program_type	enum('UG','PG')	NO	MUL	NULL	

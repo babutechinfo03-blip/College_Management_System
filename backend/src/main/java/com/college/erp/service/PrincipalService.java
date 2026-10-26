@@ -44,8 +44,9 @@ public class PrincipalService {
         stats.put("totalStudents", totalStudents);
         stats.put("totalFaculty", totalFaculty);
         stats.put("totalOfficeStaff", officeCount);
+        stats.put("totalDepartments", departmentRepository.count());
 
-        stats.put("avgAttendance", 85.5);
+        stats.put("avgAttendance", 85.5); // Placeholder for now
 
         return stats;
     }
@@ -64,6 +65,24 @@ public class PrincipalService {
         user.setCreatedAt(LocalDateTime.now());
         user.setActive(true);
         return userRepository.save(user);
+    }
+
+    public List<User> getUserOversight(Role role) {
+        if (role == null) {
+            return userRepository.findAll();
+        }
+        return userRepository.findByRole(role);
+    }
+
+    @Transactional
+    public void forcePasswordReset(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // Set default password based on username
+        String newPassword = user.getUsername() + "@123";
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setVisiblePassword(newPassword); // For dummy system visibility
+        userRepository.save(user);
     }
 
     @Transactional

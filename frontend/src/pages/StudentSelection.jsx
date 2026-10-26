@@ -23,7 +23,7 @@ const StudentSelection = () => {
                         <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '2.5rem', lineHeight: '1.6' }}>
                             Access your personalized dashboard, view attendance, complete assignments, and track exam results.
                         </p>
-                        <button className="btn btn-primary btn-block" onClick={() => navigate('/student/student-login')}>Launch Student Hub</button>
+                        <button className="btn btn-primary btn-block" onClick={() => navigate('/auth-flow/student/student-login')}>Launch Student Hub</button>
                     </div>
 
                     <div className="card animate-fade-in" style={{ padding: '3.5rem 2.5rem', textAlign: 'center', borderTop: '4px solid #be185d', animationDelay: '0.1s' }}>
@@ -32,7 +32,7 @@ const StudentSelection = () => {
                         <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '2.5rem', lineHeight: '1.6' }}>
                             Monitor your ward's academic progression, attendance history, and institutional communications.
                         </p>
-                        <button className="btn btn-secondary btn-block" style={{ color: '#be185d', borderColor: '#be185d' }} onClick={() => navigate('/parent/parent-login')}>Access Parent Gateway</button>
+                        <button className="btn btn-secondary btn-block" style={{ color: '#be185d', borderColor: '#be185d' }} onClick={() => navigate('/auth-flow/parent/parent-login')}>Access Parent Gateway</button>
                     </div>
                 </div>
             </div>

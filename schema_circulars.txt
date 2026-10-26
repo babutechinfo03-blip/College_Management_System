@@ -1,0 +1,18 @@
+﻿Field	Type	Null	Key	Default	Extra
+id	bigint	NO	PRI	NULL	auto_increment
+approved_at	datetime(6)	YES		NULL	
+attachment_url	varchar(255)	YES		NULL	
+content	text	NO		NULL	
+created_at	datetime(6)	YES		NULL	
+created_role	varchar(255)	NO		NULL	
+expiry_at	datetime(6)	YES		NULL	
+is_active	bit(1)	YES		NULL	
+priority	enum('LOW','NORMAL','HIGH','URGENT')	NO		NULL	
+requires_acknowledgement	bit(1)	YES		NULL	
+scheduled_at	datetime(6)	YES		NULL	
+status	enum('DRAFT','PENDING_APPROVAL','APPROVED','REJECTED','SCHEDULED','EXPIRED','ARCHIVED')	NO		NULL	
+title	varchar(255)	NO		NULL	
+type	enum('GENERAL','TIMETABLE','EXAM','EVENT','HOLIDAY','ALERT','FEE')	NO		NULL	
+updated_at	datetime(6)	YES		NULL	
+approved_by	bigint	YES	MUL	NULL	
+created_by	bigint	NO	MUL	NULL	

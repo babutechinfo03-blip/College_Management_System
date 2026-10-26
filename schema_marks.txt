@@ -1,0 +1,13 @@
+﻿Field	Type	Null	Key	Default	Extra
+id	bigint	NO	PRI	NULL	auto_increment
+approved_at	datetime(6)	YES		NULL	
+created_at	datetime(6)	YES		NULL	
+exam_type	varchar(255)	NO		NULL	
+marks_obtained	double	NO		NULL	
+max_marks	double	NO		NULL	
+semester	int	NO		NULL	
+status	enum('DRAFT','SUBMITTED','VERIFIED','APPROVED')	NO		NULL	
+subject_code	varchar(255)	NO		NULL	
+approved_by	bigint	YES	MUL	NULL	
+entered_by	bigint	YES	MUL	NULL	
+student_id	bigint	NO	MUL	NULL	

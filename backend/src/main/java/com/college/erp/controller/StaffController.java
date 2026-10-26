@@ -36,6 +36,12 @@ public class StaffController {
         @Autowired
         private AssistantStaffRepository assistantStaffRepository;
 
+        @Autowired
+        private AssignmentRepository assignmentRepository;
+
+        @Autowired
+        private SectionRepository sectionRepository;
+
         @GetMapping("/departments")
         public ResponseEntity<?> getDepartments() {
                 return ResponseEntity.ok(departmentRepository.findAll());
@@ -322,5 +328,44 @@ public class StaffController {
                 } catch (Exception e) {
                         return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
                 }
+        }
+
+        // ASSIGNMENT MANAGEMENT (Faculty)
+        @PostMapping("/assignments/create")
+        @PreAuthorize("hasRole('FACULTY')")
+        public ResponseEntity<?> createAssignment(@RequestBody Map<String, Object> request) {
+                try {
+                        Faculty staff = getCurrentStaff();
+                        String title = (String) request.get("title");
+                        String description = (String) request.get("description");
+                        String subjectCode = (String) request.get("subjectCode");
+                        Long sectionId = Long.valueOf(request.get("sectionId").toString());
+                        java.time.LocalDateTime deadline = java.time.LocalDateTime
+                                        .parse(request.get("deadline").toString());
+                        String attachmentPath = (String) request.get("attachmentPath");
+
+                        Assignment assignment = Assignment.builder()
+                                        .title(title)
+                                        .description(description)
+                                        .subjectCode(subjectCode)
+                                        .section(sectionRepository.findById(sectionId).orElseThrow())
+                                        .faculty(staff)
+                                        .deadline(deadline)
+                                        .attachmentPath(attachmentPath)
+                                        .build();
+
+                        assignmentRepository.save(assignment);
+                        return ResponseEntity.ok(
+                                        Map.of("message", "Assignment Created Successfully", "id", assignment.getId()));
+                } catch (Exception e) {
+                        return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+                }
+        }
+
+        @GetMapping("/assignments")
+        @PreAuthorize("hasRole('FACULTY')")
+        public ResponseEntity<?> getMyAssignments() {
+                Faculty staff = getCurrentStaff();
+                return ResponseEntity.ok(assignmentRepository.findByFacultyId(staff.getId()));
         }
 }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../services/api';
 import { useOffice } from '../../../context/OfficeContext';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const PhotoModal = ({ show, onClose, studentId, photoPath, onUploadSuccess }) => {
     const [file, setFile] = useState(null);
@@ -459,11 +461,72 @@ const StudentManagement = () => {
         );
     });
 
+    const handleExportCSV = () => {
+        const headers = ['Student ID', 'Name', 'Email', 'Department', 'Program', 'Year', 'Status'];
+        const csvContent = [
+            headers.join(','),
+            ...filteredStudents.map(s => [
+                s.studentId,
+                `${s.firstName} ${s.lastName}`,
+                s.email,
+                s.degree?.name || 'N/A',
+                s.degree?.programType || 'UG', // Fallback
+                s.currentYear,
+                s.isActive ? 'Active' : 'Inactive'
+            ].map(v => `"${v}"`).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Students_Export_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+    };
+
+    const handleExportPDF = () => {
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text('Elite College Administration', 14, 15);
+        doc.setFontSize(12);
+        doc.text(`Official Students Roster - Generated on ${new Date().toLocaleDateString()}`, 14, 25);
+
+        const tableColumn = ["ID", "Name", "Email", "Department", "Program", "Year", "Status"];
+        const tableRows = filteredStudents.map(s => [
+            s.studentId,
+            `${s.firstName} ${s.lastName}`,
+            s.email,
+            s.degree?.name || 'N/A',
+            s.degree?.programType || 'UG',
+            s.currentYear,
+            s.isActive ? 'Active' : 'Inactive'
+        ]);
+
+        doc.autoTable({
+            startY: 30,
+            head: [tableColumn],
+            body: tableRows,
+            styles: { fontSize: 8, cellPadding: 2 },
+            headStyles: { fillColor: [30, 58, 138], textColor: 255 }
+        });
+
+        doc.save(`Students_Directory_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
+
     return (
         <div>
+            {/* Action Bar */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '16px' }}>
+                <button onClick={handleExportCSV} style={{ padding: '8px 16px', background: '#10B981', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>📄</span> Export CSV
+                </button>
+                <button onClick={handleExportPDF} style={{ padding: '8px 16px', background: '#DC2626', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>🖨️</span> Export PDF
+                </button>
+            </div>
+
             {/* Search and Filters */}
-            <div className="card" style={{ marginBottom: '1.5rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+            <div className="card" style={{ marginBottom: '1.5rem', background: '#FFFFFF', padding: '24px', borderRadius: '12px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                     <input
                         type="text"
                         className="form-control"

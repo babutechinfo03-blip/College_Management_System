@@ -36,12 +36,12 @@ const AppContent = () => {
 
             {/* Institution Flow */}
             <Route path="/institution" element={<InstitutionSelection />} />
-            <Route path="/institution/:role" element={<LoginPage />} />
+            <Route path="/auth-flow/institution/:role" element={<LoginPage />} />
 
             {/* Student/Parent Flow */}
             <Route path="/portal" element={<StudentSelection />} />
-            <Route path="/student/:role" element={<LoginPage />} />
-            <Route path="/parent/:role" element={<LoginPage />} />
+            <Route path="/auth-flow/student/:role" element={<LoginPage />} />
+            <Route path="/auth-flow/parent/:role" element={<LoginPage />} />
 
             <Route path="/principal/*" element={
                 <ProtectedRoute allowedRoles={['PRINCIPAL']}>

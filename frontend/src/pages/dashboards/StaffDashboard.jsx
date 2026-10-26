@@ -14,6 +14,8 @@ import StudentList from './staff/hod/StudentList.jsx';
 import MarkApproval from './staff/hod/MarkApproval.jsx';
 import ClassAdvisorManager from './staff/hod/ClassAdvisorManager.jsx';
 
+import CircularManager from './circular/CircularManager.jsx';
+
 
 
 const StaffDashboard = () => {
@@ -38,27 +40,9 @@ const StaffDashboard = () => {
                         Staff<span style={{ color: 'var(--primary)' }}>Hub</span>
                     </h1>
                     <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '0.5rem', fontWeight: '700' }}>
-                        Academic Console
+                        {user?.staffRoles?.includes('HOD') ? 'Department Console' : 'Academic Console'}
                     </p>
                 </div>
-
-                {/* Role Switcher */}
-                {user?.staffRoles?.length > 1 && (
-                    <div style={{ marginBottom: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.75rem' }}>
-                        <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: '800' }}>Active Role</p>
-                        <select
-                            value={user.activeRole}
-                            onChange={handleRoleChange}
-                            style={{ width: '100%', background: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.1)', padding: '0.5rem', borderRadius: '0.4rem', fontSize: '0.85rem', outline: 'none' }}
-                        >
-                            {user.staffRoles.map(role => (
-                                <option key={role} value={role} style={{ background: '#0f172a' }}>
-                                    {role.replace('_', ' ')}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
 
                 <nav style={{ flex: 1 }}>
                     {/* Common Link */}
@@ -66,9 +50,10 @@ const StaffDashboard = () => {
                         <span style={{ fontSize: '1.25rem' }}>📅</span> Overview
                     </Link>
 
-                    {/* Faculty Specific */}
-                    {user.activeRole === 'FACULTY' && (
+                    {/* Faculty Specific (Available to all staff as they are all faculty) */}
+                    {(user?.staffRoles?.includes('FACULTY') || user?.staffRoles?.includes('HOD')) && (
                         <>
+                            <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem', fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800', paddingLeft: '1rem' }}>My Classes</div>
                             <Link to="/staff/attendance" className={`sidebar-item ${isActive('/staff/attendance')}`}>
                                 <span style={{ fontSize: '1.25rem' }}>✅</span> Attendance
                             </Link>
@@ -78,12 +63,16 @@ const StaffDashboard = () => {
                             <Link to="/staff/marks" className={`sidebar-item ${isActive('/staff/marks')}`}>
                                 <span style={{ fontSize: '1.25rem' }}>🎯</span> Internal Marks
                             </Link>
+                            <Link to="/staff/circulars" className={`sidebar-item ${isActive('/staff/circulars')}`}>
+                                <span style={{ fontSize: '1.25rem' }}>📢</span> Circulars
+                            </Link>
                         </>
                     )}
 
                     {/* Class Advisor Specific */}
-                    {user.activeRole === 'CLASS_ADVISOR' && (
+                    {user?.staffRoles?.includes('CLASS_ADVISOR') && (
                         <>
+                            <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem', fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800', paddingLeft: '1rem' }}>Advisory</div>
                             <Link to="/staff/advisor/class" className={`sidebar-item ${isActive('/staff/advisor/class')}`}>
                                 <span style={{ fontSize: '1.25rem' }}>👨‍🎓</span> My Class
                             </Link>
@@ -94,8 +83,9 @@ const StaffDashboard = () => {
                     )}
 
                     {/* HOD Specific */}
-                    {user.activeRole === 'HOD' && (
+                    {user?.staffRoles?.includes('HOD') && (
                         <>
+                            <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem', fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800', paddingLeft: '1rem' }}>Department</div>
                             <Link to="/staff/hod/department" className={`sidebar-item ${isActive('/staff/hod/department')}`}>
                                 <span style={{ fontSize: '1.25rem' }}>🏢</span> Dept Analytics
                             </Link>
@@ -118,7 +108,9 @@ const StaffDashboard = () => {
                 <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem' }}>
                     <div style={{ marginBottom: '1.5rem' }}>
                         <p style={{ fontSize: '0.875rem', color: 'white', fontWeight: '600' }}>{user?.username}</p>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user.activeRole.replace('_', ' ')}</p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                            {user?.staffRoles?.join(' • ').replace(/_/g, ' ')}
+                        </p>
                     </div>
                     <button className="btn btn-secondary btn-block" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', border: 'none', justifyContent: 'center' }} onClick={logout}>
                         Sign Out
@@ -130,13 +122,13 @@ const StaffDashboard = () => {
                 <header style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div className="animate-fade-in">
                         <h2 style={{ fontSize: '1.75rem', color: 'var(--slate-900)' }}>
-                            {user.activeRole === 'HOD' ? 'Department Console' :
-                                user.activeRole === 'CLASS_ADVISOR' ? 'Advisor Console' :
+                            {user?.staffRoles?.includes('HOD') ? 'Department Console' :
+                                user?.staffRoles?.includes('CLASS_ADVISOR') ? 'Advisor Console' :
                                     'Academic Console'}
                         </h2>
                         <p style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>
-                            {user.activeRole === 'HOD' ? 'Manage department-wide academic operations.' :
-                                user.activeRole === 'CLASS_ADVISOR' ? 'Monitor student performance and approvals.' :
+                            {user?.staffRoles?.includes('HOD') ? 'Manage department-wide academic operations and your own classes.' :
+                                user?.staffRoles?.includes('CLASS_ADVISOR') ? 'Monitor student performance and approve leaves.' :
                                     'Manage your classes and evaluate student performance.'}
                         </p>
                     </div>
@@ -158,6 +150,9 @@ const StaffDashboard = () => {
                         <Route path="hod/students" element={<StudentList />} />
                         <Route path="hod/marks" element={<MarkApproval />} />
                         <Route path="hod/*" element={<HodDashboard />} />
+
+                        {/* Common Staff Routes */}
+                        <Route path="circulars" element={<CircularManager />} />
 
                         <Route path="*" element={<StaffOverview />} />
                     </Routes>

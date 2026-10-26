@@ -9,19 +9,22 @@ import java.util.List;
 @Repository
 public interface MarkEntryRepository extends JpaRepository<MarkEntry, Long> {
 
-    // For Faculty: View drafts and submitted
-    List<MarkEntry> findByEnteredById(Long facultyId);
+        // For Students: View their own marks
+        List<MarkEntry> findByStudentId(Long studentId);
 
-    // For Advisor: View submitted marks for verification (by class context roughly)
-    // Complex query usually needed here joining student -> class
-    // For MVP: List by subject/semester
-    List<MarkEntry> findBySubjectCodeAndSemester(String subjectCode, Integer semester);
+        // For Faculty: View drafts and submitted
+        List<MarkEntry> findByEnteredById(Long facultyId);
 
-    long countByStudentDegreeDepartmentIdAndStatus(Long departmentId, MarkEntry.MarkStatus status);
+        // For Advisor: View submitted marks for verification (by class context roughly)
+        // Complex query usually needed here joining student -> class
+        // For MVP: List by subject/semester
+        List<MarkEntry> findBySubjectCodeAndSemester(String subjectCode, Integer semester);
 
-    long countByStudentDegreeDepartmentIdAndStatusIn(Long departmentId,
-            java.util.Collection<MarkEntry.MarkStatus> statuses);
+        long countByStudentDegreeDepartmentIdAndStatus(Long departmentId, MarkEntry.MarkStatus status);
 
-    java.util.List<MarkEntry> findByStudentDegreeDepartmentIdAndStatusIn(Long departmentId,
-            java.util.Collection<MarkEntry.MarkStatus> statuses);
+        long countByStudentDegreeDepartmentIdAndStatusIn(Long departmentId,
+                        java.util.Collection<MarkEntry.MarkStatus> statuses);
+
+        java.util.List<MarkEntry> findByStudentDegreeDepartmentIdAndStatusIn(Long departmentId,
+                        java.util.Collection<MarkEntry.MarkStatus> statuses);
 }
