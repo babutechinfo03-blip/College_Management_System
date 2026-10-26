@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import { useAuth } from './AuthContext';
+import { BASE_SERVER_URL } from '../services/api';
 
 const SocketContext = createContext(null);
 
@@ -13,7 +14,7 @@ export const SocketProvider = ({ children }) => {
     useEffect(() => {
         let mounted = true;
         if (user && user.token) {
-            const socket = new SockJS('http://localhost:8080/ws');
+            const socket = new SockJS(`${BASE_SERVER_URL}/ws`);
             const client = Stomp.over(socket);
             client.debug = null;
 

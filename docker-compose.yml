@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: college_erp_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: college_erp_v2
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./dummy_data.sql:/docker-entrypoint-initdb.d/01_dummy_data.sql:ro
+      - ./seed_part1_staff.sql:/docker-entrypoint-initdb.d/02_seed_staff.sql:ro
+      - ./seed_part2_students.sql:/docker-entrypoint-initdb.d/03_seed_students.sql:ro
+      - ./seed_part3_academic.sql:/docker-entrypoint-initdb.d/04_seed_academic.sql:ro
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: college_erp_backend
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: college_erp_v2
+      DB_USERNAME: root
+      DB_PASSWORD: password
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - backend_uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: college_erp_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  mysql_data:
+  backend_uploads:
